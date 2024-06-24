@@ -10,6 +10,7 @@ const char *ssid = "WIFI_CAR_4";
 const char *password = "456456456";
 
 bool high_speed_mode = false;
+bool repeat_command=false;
 // connections for drive Motors
 int PWM_A = 5;
 int PWM_B = 4;
@@ -21,6 +22,8 @@ int DIR_B = 2;
 // const int wifiLedPin = D0;  // set digital pin D0 as indication, the LED turn on if NodeMCU connected to WiFi as STA mode
 
 String command;   // String to store app command state.
+String prev_command;   // String to store app command state.
+
 int SPEED = 180;  // 330 - 1023.
 int speed_Coeff = 3;
 
@@ -133,6 +136,8 @@ void loop() {
   server.handleClient();  // listen for HTTP requests from clients
 
   command = server.arg("State");  // check HTPP request, if has arguments "State" then saved the value
+  if (prev_command==command) {repeat_command=true;} else {repeat_command=false;}
+  prev_command=command;
   if (command == "F") Forward();  // check string then call a function or set a value
   else if (command == "B") Backward();
   else if (command == "R") TurnRight();
@@ -181,7 +186,7 @@ void StartMotor() {
 void Forward() {
   digitalWrite(DIR_A, HIGH);
   digitalWrite(DIR_B, LOW);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
   analogWrite(PWM_A, SPEED);
   analogWrite(PWM_B, SPEED);
 }
@@ -190,7 +195,7 @@ void Forward() {
 void Backward() {
   digitalWrite(DIR_A, LOW);
   digitalWrite(DIR_B, HIGH);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
   analogWrite(PWM_A, SPEED);
   analogWrite(PWM_B, SPEED);
 }
@@ -199,7 +204,7 @@ void Backward() {
 void TurnRight() {
   digitalWrite(DIR_A, LOW);
   digitalWrite(DIR_B, LOW);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
   analogWrite(PWM_A, SPEED);
   analogWrite(PWM_B, SPEED);
 }
@@ -208,7 +213,7 @@ void TurnRight() {
 void TurnLeft() {
   digitalWrite(DIR_A, HIGH);
   digitalWrite(DIR_B, HIGH);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
 
   analogWrite(PWM_A, SPEED);
   analogWrite(PWM_B, SPEED);
@@ -218,7 +223,7 @@ void TurnLeft() {
 void ForwardLeft() {
   digitalWrite(DIR_A, HIGH);
   digitalWrite(DIR_B, LOW);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
 
   analogWrite(PWM_A, SPEED);
   analogWrite(PWM_B, SPEED / speed_Coeff);
@@ -228,7 +233,7 @@ void ForwardLeft() {
 void BackwardLeft() {
   digitalWrite(DIR_A, LOW);
   digitalWrite(DIR_B, HIGH);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
 
   analogWrite(PWM_A, SPEED);
   analogWrite(PWM_B, SPEED / speed_Coeff);
@@ -238,7 +243,7 @@ void BackwardLeft() {
 void ForwardRight() {
   digitalWrite(DIR_A, HIGH);
   digitalWrite(DIR_B, LOW);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
 
   analogWrite(PWM_A, SPEED / speed_Coeff);
   analogWrite(PWM_B, SPEED);
@@ -248,7 +253,7 @@ void ForwardRight() {
 void BackwardRight() {
   digitalWrite(DIR_A, LOW);
   digitalWrite(DIR_B, HIGH);
-  if (!high_speed_mode) { StartMotor(); }
+  if (!high_speed_mode && !repeat_command) { StartMotor(); }
 
   analogWrite(PWM_A, SPEED / speed_Coeff);
   analogWrite(PWM_B, SPEED);
@@ -278,5 +283,5 @@ void TurnLightOn() {
 void TurnLightOff() {
   Serial.println("HS_off");
   high_speed_mode = false;
-  SPEED = 120;
+  SPEED = 130;
 }
