@@ -66,7 +66,7 @@ void setup() {
 
   myservo.write(90);
   delay(500);
-  myservo.write(10);
+  myservo.write(100);
   delay(500);
   myservo.write(90);
   // set NodeMCU Wifi hostname based on chip mac address
